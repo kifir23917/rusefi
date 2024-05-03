@@ -97,7 +97,7 @@ PrimaryTriggerDecoder::PrimaryTriggerDecoder(const char* p_name)
 }
 
 #if ! EFI_PROD_CODE
-bool printTriggerDebug = false;
+bool printTriggerDebug = true;
 bool printTriggerTrace = false;
 #endif /* ! EFI_PROD_CODE */
 
