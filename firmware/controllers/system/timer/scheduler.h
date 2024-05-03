@@ -65,10 +65,9 @@ struct scheduling_s {
     return momentX;
   }
 
-  efitick_t getMomentUs() {
-    return momentX;
-  }
+  efitick_t getMomentUs();
 
+// todo: get rid of this 'I am not sure what's the proper type' method once we are done cleaning things up in unit tests
   efitick_t getMomentRaw() {
     return momentX;
   }

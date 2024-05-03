@@ -166,9 +166,9 @@ void EventQueue::remove(scheduling_s* scheduling) {
  * This method is always invoked under a lock
  * @return Get the timestamp of the soonest pending action, skipping all the actions in the past
  */
-expected<efitick_t> EventQueue::getNextEventTime(efitick_t nowX) const {
+expected<efitick_t> EventQueue::getNextEventTime(efitick_t nowNt) const {
 	if (m_head) {
-		if (m_head->getMomentUs() <= nowX) {
+		if (m_head->getMomentNt() <= nowNt) {
 			/**
 			 * We are here if action timestamp is in the past. We should rarely be here since this 'getNextEventTime()' is
 			 * always invoked by 'scheduleTimerCallback' which is always invoked right after 'executeAllPendingActions' - but still,
@@ -177,9 +177,9 @@ expected<efitick_t> EventQueue::getNextEventTime(efitick_t nowX) const {
 			 * looks like we end up here after 'writeconfig' (which freezes the firmware) - we are late
 			 * for the next scheduled event
 			 */
-			return nowX + m_lateDelay;
+			return nowNt + m_lateDelay;
 		} else {
-			return m_head->getMomentUs();
+			return m_head->getMomentNt();
 		}
 	}
 
@@ -231,9 +231,18 @@ bool EventQueue::executeOne(efitick_t now) {
 		return false;
 	}
 
+#if EFI_UNIT_TEST
+  // problem: we have a defect - tests are using US not NT so we are comparing apples to oranges here!
+//	efitick_t spinDuration = current->getMomentNt() - getTimeNowNt();
+//	if (spinDuration > 0) {
+//		throw std::runtime_error("Time Spin in unit test");
+//	}
+#endif
+
 	// near future - spin wait for the event to happen and avoid the
 	// overhead of rescheduling the timer.
 	// yes, that's a busy wait but that's what we need here
+  // todo: problem: we have a defect - tests are using US not NT so we are comparing apples to oranges here!
 	while (current->getMomentNt() > getTimeNowNt()) {
 		UNIT_TEST_BUSY_WAIT_CALLBACK();
 	}
