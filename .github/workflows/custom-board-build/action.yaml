@@ -190,6 +190,7 @@ runs:
         else
           echo "Not LTS branch [${{github.ref}}]"
         fi
+        echo BRANCH_NAME=${{github.ref_type == 'branch' && github.ref_name || ''}} >> $GITHUB_ENV
 
     - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
       uses: carlosperate/arm-none-eabi-gcc-action@v1
@@ -297,7 +298,7 @@ runs:
           echo "Not uploading [${{github.ref}}]"
           exit 0
         fi
-        bash ../firmware/bin/upload_bundle.sh ${{ env.RUSEFI_SSH_USER }} ${{ env.RUSEFI_SSH_PASS }} ${{ env.RUSEFI_SSH_SERVER }} ${{ env.BUNDLE_NAME }}
+        bash ../firmware/bin/upload_bundle.sh ${{ env.RUSEFI_SSH_USER }} ${{ env.RUSEFI_SSH_PASS }} ${{ env.RUSEFI_SSH_SERVER }} "${{github.ref_type == 'branch' && format('{0}_{1}', github.ref_name, env.BUNDLE_NAME) || env.BUNDLE_NAME}}"
 
     - name: Run Simulator
       if: ${{ inputs.run_simulator == 'true' }}
@@ -454,21 +455,21 @@ runs:
           echo "obfuscated: Not uploading [${{github.ref}}]"
           exit 0
         fi
-        bash ../firmware/bin/upload_bundle.sh ${{ inputs.RUSEFI_OBFUSCATED_PUBLIC_SSH_USER }} "${{ inputs.RUSEFI_OBFUSCATED_PUBLIC_SSH_PASS }}" ${{ inputs.RUSEFI_OBFUSCATED_PUBLIC_SSH_SERVER }} "${{env.SHORT_BOARD_NAME}}_obfuscated_public"
+        bash ../firmware/bin/upload_bundle.sh ${{ inputs.RUSEFI_OBFUSCATED_PUBLIC_SSH_USER }} "${{ inputs.RUSEFI_OBFUSCATED_PUBLIC_SSH_PASS }}" ${{ inputs.RUSEFI_OBFUSCATED_PUBLIC_SSH_SERVER }} "${{github.ref_type == 'branch' && format('{0}_{1}', github.ref_name, env.SHORT_BOARD_NAME) || env.SHORT_BOARD_NAME}}_obfuscated_public"
 
     - name: Upload github action bundle obfuscated_public artifact
       if: ${{ contains(inputs.artifacts, 'obfuscated') }}
       uses: actions/upload-artifact@v4
       with:
-        name: rusefi_bundle_${{env.SHORT_BOARD_NAME}}_obfuscated_public_${{env.current_date}}.zip
-        path: ${{inputs.rusefi_dir}}/artifacts/rusefi_bundle_${{env.SHORT_BOARD_NAME}}_obfuscated_public.zip
+        name: rusefi_bundle${{github.ref_type == 'branch' && format('{0}_{1}', github.ref_name, env.SHORT_BOARD_NAME) || env.SHORT_BOARD_NAME}}_obfuscated_public_${{env.current_date}}.zip
+        path: ${{inputs.rusefi_dir}}/artifacts/rusefi_bundle${{github.ref_type == 'branch' && format('{0}_{1}', github.ref_name, env.SHORT_BOARD_NAME) || env.SHORT_BOARD_NAME}}_obfuscated_public.zip
 
     - name: Upload github action bundle obfuscated_public_autoupdate artifact
       if: ${{ contains(inputs.artifacts, 'obfuscated') }}
       uses: actions/upload-artifact@v4
       with:
-        name: rusefi_bundle_${{env.SHORT_BOARD_NAME}}_obfuscated_public_autoupdate_${{env.current_date}}.zip
-        path: ${{inputs.rusefi_dir}}/artifacts/rusefi_bundle_${{env.SHORT_BOARD_NAME}}_obfuscated_public_autoupdate.zip
+        name: rusefi_bundle${{github.ref_type == 'branch' && format('{0}_{1}', github.ref_name, env.SHORT_BOARD_NAME) || env.SHORT_BOARD_NAME}}_obfuscated_public_autoupdate_${{env.current_date}}.zip
+        path: ${{inputs.rusefi_dir}}/artifacts/rusefi_bundle${{github.ref_type == 'branch' && format('{0}_{1}', github.ref_name, env.SHORT_BOARD_NAME) || env.SHORT_BOARD_NAME}}_obfuscated_public_autoupdate.zip
 
     - uses: mukunku/tag-exists-action@v1.6.0
       id: checkTag

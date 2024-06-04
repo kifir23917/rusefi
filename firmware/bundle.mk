@@ -32,7 +32,11 @@ endif
 DELIVER = deliver
 ARTIFACTS = ../artifacts
 
-BUNDLE_FULL_NAME = rusefi_bundle_$(BUNDLE_NAME)
+ifneq (,$(BRANCH_NAME))
+	BUNDLE_FULL_NAME_BRANCH_TOKEN = _$(BRANCH_NAME)
+endif
+
+BUNDLE_FULL_NAME = rusefi_bundle$(BUNDLE_FULL_NAME_BRANCH_TOKEN)_$(BUNDLE_NAME)
 
 CONSOLE_FOLDER = $(FOLDER)/console
 DRIVERS_FOLDER = $(FOLDER)/drivers
