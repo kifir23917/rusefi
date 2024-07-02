@@ -9,10 +9,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 public class ConnectionAndMeta {
     public static final String BASE_URL_RELEASE = "https://github.com/rusefi/rusefi/releases/latest/download/";
+    public static final String DEFAULT_WHITELABEL_PREFIX = "rusefi_bundle_";
     public static final String AUTOUPDATE = "/autoupdate/";
 
     private static final int BUFFER_SIZE = 32 * 1024;
@@ -31,6 +33,11 @@ public class ConnectionAndMeta {
         String result = getProperties().getProperty("auto_update_root_url");
         System.out.println(ConnectionAndMeta.class + ": got [" + result + "]");
         return result;
+    }
+
+    public static String getWhitelabelPrefix() {
+        return Optional.ofNullable(getProperties().getProperty("whitelabel_prefix")).map(String::trim)
+            .orElse(DEFAULT_WHITELABEL_PREFIX);
     }
 
     public static String getWhitelabel() {

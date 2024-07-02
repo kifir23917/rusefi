@@ -70,7 +70,12 @@ public class Autoupdate {
         } else if (args.length > 0 && args[0].equalsIgnoreCase("release")) {
             // this branch needs progress for custom boards!
             System.out.println("Release update requested");
-            downloadAndUnzipAutoupdate(bundleInfo, UpdateMode.ALWAYS, ConnectionAndMeta.BASE_URL_RELEASE);
+            downloadAndUnzipAutoupdate(
+                bundleInfo,
+                UpdateMode.ALWAYS,
+                ConnectionAndMeta.BASE_URL_RELEASE,
+                ConnectionAndMeta.DEFAULT_WHITELABEL_PREFIX
+            );
         } else {
             UpdateMode mode = getMode();
             if (mode != UpdateMode.NEVER) {
@@ -85,9 +90,19 @@ public class Autoupdate {
     private static void doDownload(BundleUtil.BundleInfo bundleInfo, UpdateMode mode) {
         if (bundleInfo.getBranchName().equals("snapshot")) {
             System.out.println("Snapshot requested");
-            downloadAndUnzipAutoupdate(bundleInfo, mode, ConnectionAndMeta.getBaseUrl() + ConnectionAndMeta.AUTOUPDATE);
+            downloadAndUnzipAutoupdate(
+                bundleInfo,
+                mode,
+                ConnectionAndMeta.getBaseUrl() + ConnectionAndMeta.AUTOUPDATE,
+                ConnectionAndMeta.getWhitelabelPrefix()
+            );
         } else {
-            downloadAndUnzipAutoupdate(bundleInfo, mode, ConnectionAndMeta.getBaseUrl() + "/lts/" + bundleInfo.getBranchName() + ConnectionAndMeta.AUTOUPDATE);
+            downloadAndUnzipAutoupdate(
+                bundleInfo,
+                mode,
+                ConnectionAndMeta.getBaseUrl() + "/lts/" + bundleInfo.getBranchName() + ConnectionAndMeta.AUTOUPDATE,
+                ConnectionAndMeta.getWhitelabelPrefix()
+            );
         }
     }
 
@@ -116,10 +131,15 @@ public class Autoupdate {
         }
     }
 
-    private static void downloadAndUnzipAutoupdate(BundleUtil.BundleInfo info, UpdateMode mode, String baseUrl) {
+    private static void downloadAndUnzipAutoupdate(
+        BundleUtil.BundleInfo info,
+        UpdateMode mode,
+        String baseUrl,
+        String whitelabelPrefix
+    ) {
         try {
             String suffix = FindFileHelper.isObfuscated() ? "_obfuscated_public" : "";
-            String zipFileName = "rusefi_bundle_" + info.getTarget() + suffix + "_autoupdate" + ".zip";
+            String zipFileName = whitelabelPrefix + info.getTarget() + suffix + "_autoupdate" + ".zip";
             ConnectionAndMeta connectionAndMeta = new ConnectionAndMeta(zipFileName).invoke(baseUrl);
             System.out.println("Remote file " + zipFileName);
             System.out.println("Server has " + connectionAndMeta.getCompleteFileSize() + " from " + new Date(connectionAndMeta.getLastModified()));
